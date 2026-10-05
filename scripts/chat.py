@@ -12,6 +12,7 @@ from collections.abc import Iterable, Iterator
 from typing import Any
 
 import boto3
+from botocore.exceptions import ClientError
 
 
 def render(stream: Iterable[dict[str, Any]]) -> Iterator[str]:
@@ -48,14 +49,19 @@ def main() -> None:
         if not prompt:
             continue
 
-        response = client.invoke_harness(
-            harnessArn=args.harness_arn,
-            runtimeSessionId=session_id,
-            messages=[{"role": "user", "content": [{"text": prompt}]}],
-        )
         print("agent> ", end="", flush=True)
-        for chunk in render(response["stream"]):
-            print(chunk, end="", flush=True)
+        try:
+            response = client.invoke_harness(
+                harnessArn=args.harness_arn,
+                runtimeSessionId=session_id,
+                messages=[{"role": "user", "content": [{"text": prompt}]}],
+            )
+            for chunk in render(response["stream"]):
+                print(chunk, end="", flush=True)
+        except ClientError as exc:
+            # Errors can arrive mid-stream as well as from the call itself.
+            # Show them and keep the session, rather than ending the chat.
+            print(f"\n  [error] {exc}", end="")
         print("\n")
 
 

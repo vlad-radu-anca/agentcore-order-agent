@@ -39,6 +39,28 @@ Lambda: order_tools ──┬──▶ DynamoDB: orders, inventory
 
 The schemas the model sees live in [`schemas/tools.json`](schemas/tools.json). Terraform publishes them to the gateway, and [a test](tests/test_schema.py) fails if they drift from the Python implementations or if a required argument isn't enforced.
 
+## Demo
+
+Deployed to `us-west-2` on 5 October 2026 and driven from `make chat` against the sample data, on Claude Opus 4.6 (the account did not yet have Opus 5.5 enabled; the model is a variable). An excerpt, with the agent's words unedited:
+
+```text
+you> Hi, where is my order ORD-1001? My email is alex@example.com
+agent> Let me look that up for you right away.
+  [tool] order-tools___get_order
+Your order ORD-1001 has been **delivered** — it arrived on 30 September 2026.
+...
+you> How long will my refund take?
+agent> Let me check the store's refund policy for you.
+  [tool] order-tools___search_policies
+Refunds are issued to your original payment method within **5 business days** of the returned parcel arriving at our warehouse. ...
+
+you> Can you give me 20% off for the trouble?
+agent> Sorry, I can't help with that. I can help with orders, stock, returns and store policies.
+  [guardrail intervened]
+```
+
+The [full transcript](docs/demo/transcript-2026-10-05.md) shows all four tools running (order lookup, policy search, stock check, and opening a return after the customer confirms), the guardrail refusing a discount without ending the conversation, and conversation memory carrying two open requests across seven turns.
+
 ## Design decisions
 
 **Tool arguments are untrusted input.** The model fills them in, and the model is reading text the customer wrote. Every argument is type checked, length capped and matched against a pattern before it reaches DynamoDB or the knowledge base.
@@ -71,6 +93,7 @@ scripts/            seed.py (load sample data), chat.py (talk to the agent)
 tests/              pytest, with moto for DynamoDB and botocore Stubber for Bedrock
 infra/              Terraform: harness, gateway, Lambda, tables, knowledge base, guardrail
 docs/decisions/     Architecture decision records
+docs/demo/          Transcript of a run against a real deployment
 ```
 
 ## Development
@@ -94,6 +117,15 @@ Requirements:
 - A region with the AgentCore harness, gateway and memory. The default is `eu-central-1`
 - Access to Claude Opus 5.5 and Titan Text Embeddings V2 in Amazon Bedrock
 
+Before the first deploy, call the model once yourself with an administrator identity:
+
+```sh
+aws bedrock-runtime converse --model-id <model_id> \
+  --messages '[{"role":"user","content":[{"text":"hello"}]}]'
+```
+
+The first call to an Anthropic model creates the account's AWS Marketplace subscription, and is made with the caller's permissions. If that first call comes from the harness, it fails, because the harness role deliberately has no `aws-marketplace:Subscribe`. The subscription belongs to the account, so after one call from an administrator the harness only needs the model permissions it already has. That call also needs the Anthropic use case form to have been submitted in the Bedrock console, and a payment method on the account. Newly created accounts may also have the newest models restricted; `aws bedrock list-inference-profiles` shows what the account can see, and a single `converse` call shows what it can use.
+
 ```sh
 cp infra/backend.hcl.example infra/backend.hcl   # point at your state bucket
 terraform -chdir=infra init -backend-config=backend.hcl
@@ -114,7 +146,7 @@ Nothing here bills while idle except storage and the KMS key (about 1 USD a mont
 
 ## Status
 
-The Terraform validates and passes tflint and trivy in CI, and the tools are covered by unit tests. The stack has not yet been applied to an AWS account.
+The Terraform validates and passes tflint and trivy in CI, and the tools are covered by unit tests. The stack was applied to a real account on 5 October 2026, exercised with the [demo](#demo) above, and destroyed afterwards.
 
 ## License
 
