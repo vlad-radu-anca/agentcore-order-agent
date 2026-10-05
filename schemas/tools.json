@@ -1,0 +1,70 @@
+[
+  {
+    "name": "get_order",
+    "description": "Look up an order. Needs both the order number and the email address the order was placed with; if either is wrong the order is reported as not found. Returns status, items, totals and any existing return request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Order number, for example ORD-1001."
+        },
+        "customer_email": {
+          "type": "string",
+          "description": "Email address the order was placed with."
+        }
+      },
+      "required": ["order_id", "customer_email"]
+    }
+  },
+  {
+    "name": "check_inventory",
+    "description": "Check current stock for a product by SKU. Returns units available, whether it is in stock, and the expected restock date when it is not.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sku": {
+          "type": "string",
+          "description": "Product SKU as shown on the order, for example KB-ALU-75."
+        }
+      },
+      "required": ["sku"]
+    }
+  },
+  {
+    "name": "request_return",
+    "description": "Open a return for a delivered order inside the return window. Creates a return request for the full order and returns its ID and refund amount; it does not move any money. Safe to call twice: a second call returns the existing request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Order number, for example ORD-1001."
+        },
+        "customer_email": {
+          "type": "string",
+          "description": "Email address the order was placed with."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The customer's reason for the return, in their words."
+        }
+      },
+      "required": ["order_id", "customer_email", "reason"]
+    }
+  },
+  {
+    "name": "search_policies",
+    "description": "Search the store's policy documents (returns, refunds, shipping, warranty). Use it before answering any policy question, and answer from the passages it returns.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "A natural language question, for example 'how long do refunds take'."
+        }
+      },
+      "required": ["query"]
+    }
+  }
+]

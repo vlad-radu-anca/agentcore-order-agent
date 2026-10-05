@@ -1,0 +1,6 @@
+# Copy to backend.hcl (git-ignored) and point it at your state bucket.
+bucket       = "my-terraform-state"
+key          = "agentcore-order-agent/terraform.tfstate"
+region       = "eu-central-1"
+encrypt      = true
+use_lockfile = true

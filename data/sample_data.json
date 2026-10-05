@@ -1,0 +1,53 @@
+{
+  "orders": [
+    {
+      "order_id": "ORD-1001",
+      "customer_email": "alex@example.com",
+      "status": "DELIVERED",
+      "placed_days_ago": 9,
+      "delivered_days_ago": 5,
+      "currency": "EUR",
+      "items": [
+        {"sku": "KB-ALU-75", "name": "Aluminium 75% mechanical keyboard", "quantity": 1, "unit_price": 149.00},
+        {"sku": "CB-USBC-2M", "name": "Braided USB-C cable, 2 m", "quantity": 2, "unit_price": 12.50}
+      ]
+    },
+    {
+      "order_id": "ORD-1002",
+      "customer_email": "alex@example.com",
+      "status": "DELIVERED",
+      "placed_days_ago": 52,
+      "delivered_days_ago": 45,
+      "currency": "EUR",
+      "items": [
+        {"sku": "MS-WL-02", "name": "Wireless ergonomic mouse", "quantity": 1, "unit_price": 59.90}
+      ]
+    },
+    {
+      "order_id": "ORD-1003",
+      "customer_email": "sam@example.com",
+      "status": "SHIPPED",
+      "placed_days_ago": 3,
+      "currency": "EUR",
+      "items": [
+        {"sku": "HD-ANC-01", "name": "Noise cancelling headphones", "quantity": 1, "unit_price": 229.00}
+      ]
+    },
+    {
+      "order_id": "ORD-1004",
+      "customer_email": "sam@example.com",
+      "status": "PLACED",
+      "placed_days_ago": 1,
+      "currency": "EUR",
+      "items": [
+        {"sku": "KB-ALU-75", "name": "Aluminium 75% mechanical keyboard", "quantity": 1, "unit_price": 149.00}
+      ]
+    }
+  ],
+  "inventory": [
+    {"sku": "KB-ALU-75", "name": "Aluminium 75% mechanical keyboard", "available": 14},
+    {"sku": "CB-USBC-2M", "name": "Braided USB-C cable, 2 m", "available": 230},
+    {"sku": "MS-WL-02", "name": "Wireless ergonomic mouse", "available": 0, "restock_in_days": 12},
+    {"sku": "HD-ANC-01", "name": "Noise cancelling headphones", "available": 3}
+  ]
+}

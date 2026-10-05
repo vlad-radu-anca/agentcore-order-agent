@@ -1,0 +1,23 @@
+[project]
+name = "agentcore-order-agent"
+version = "0.1.0"
+description = "Order support agent on Amazon Bedrock AgentCore: Lambda tools behind an AgentCore Gateway"
+requires-python = ">=3.13"
+license = "Apache-2.0"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "scripts", "tests"]
+testpaths = ["tests"]
+addopts = "--strict-markers --cov=order_tools --cov-report=term-missing --cov-fail-under=90"
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+# assert is how pytest checks things
+per-file-ignores = { "tests/**" = ["S101"] }
+
+[tool.ruff.lint.isort]
+known-first-party = ["order_tools"]
